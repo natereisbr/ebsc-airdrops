@@ -122,10 +122,6 @@ app.get('/', async (req, res) => {
 
   payload = await getData(payload)
 
-  // Simple mock
-  // payload = fs.readFileSync('mock.txt', 'utf8')
-  // payload = JSON.parse(payload)
-
   console.log(payload.wallets.length)
 
   res.render('index.ejs',{payload:  JSON.stringify(payload)});
