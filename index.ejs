@@ -108,6 +108,9 @@
                     <h2>
                         Project settings:
                     </h2>
+                    <p>
+                        <span>$EBSC eligible:</span> {{ tokensEligible }}
+                    </p>
                     <div class="form-group">
                         <label for="">Market Cap ($):</label>
                         <input class="form-control" type="text" v-model="project.mc">
@@ -115,6 +118,10 @@
                     <div class="form-group">
                         <label for="">Quantity of tokens:</label>
                         <input class="form-control" type="text" v-model="project.tokenQuantity">
+                    </div>
+                    <div class="form-group">
+                        <label for="">Airdrop %:</label>
+                        <input class="form-control" type="text" v-model="project.airdropPerc">
                     </div>
                     <div class="form-group">
                         <label for="">Wallet address:</label>
@@ -140,14 +147,14 @@
                                         <div>{{wallet.amount}}</div>
                                     </div>
                                     <div>
-                                        <span>Tier percentage:</span>
-                                        <div>{{ ((wallet.amount / payload.tiers[wallet.tier].total) * 100).toFixed(2) }}%</div>
+                                        <span>Percentage:</span>
+                                        <div>{{ ((wallet.amount / tokensEligible) * 100).toFixed(2) }}%</div>
                                     </div>
                                 </div>
                                 <span>Airdrop:</span>
                                 <div class="highlight">
-                                    {{ ((wallet.amount / payload.tiers[wallet.tier].total) * project.airdrop[wallet.tier]).toFixed(2) }} Tokens
-                                    <span>${{ ((wallet.amount / payload.tiers[wallet.tier].total) * project.airdrop[wallet.tier] * project.price).toFixed(2) }}</span>
+                                    {{ ((wallet.amount / tokensEligible) * project.airdropTokens).toFixed(2) }} Tokens
+                                    <span>${{ ((wallet.amount / tokensEligible) * project.airdropTokens * project.price).toFixed(2) }}</span>
                                 </div>
                             </div>
                         </div>
@@ -170,6 +177,8 @@
                     mc: 10000000,
                     tokenQuantity: 5000000,
                     price: 0,
+                    airdropPerc: 1,
+                    airdropTokens: 0,
                     airdrop: {
                         strategist: 0,
                         evangelist: 0,
@@ -183,12 +192,18 @@
                 searchAddress: '',
                 payload: JSON.parse('<%- payload %>')
             },
+
+            computed: {
+                tokensEligible() {
+                    return this.payload.tiers['evangelist'].total + this.payload.tiers['strategist'].total
+                }
+            },
+
             methods: {
                 search() {
                     this.isSearching = false
-                    if (this.project.mc && this.project.mc != 0 && this.project.tokenQuantity && this.project.tokenQuantity != 0) {
-                        this.project.airdrop.evangelist = this.project.airdropPercentage.evangelist * this.project.tokenQuantity
-                        this.project.airdrop.strategist = this.project.airdropPercentage.strategist * this.project.tokenQuantity
+                    if (this.project.mc && this.project.mc != 0 && this.project.tokenQuantity && this.project.tokenQuantity != 0 && this.project.airdropPerc > 0 && this.project.airdropPerc <= 100) {
+                        this.project.airdropTokens = (this.project.airdropPerc / 100) * this.project.tokenQuantity
                         this.project.price = this.project.mc / this.project.tokenQuantity
                         this.isSearching = true
                     }

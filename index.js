@@ -19,6 +19,7 @@ const blacklist = [
   ' PancakeSwap V2: EBSC',
   '0x0f59d00312b0c8f9215fdbad81d3341fbf676900',
   '0xed3d9db9c714f88df9eb579134b525f9863b2dda',
+  '0x64be33a23a7753a8e6f32117f480cb04cc753378',
   'Burn Address',
   'Lithium: EBSC Token',
   'Hotbit 2'
@@ -121,8 +122,6 @@ app.get('/', async (req, res) => {
   }
 
   payload = await getData(payload)
-
-  console.log(payload.wallets.length)
 
   res.render('index.ejs',{payload:  JSON.stringify(payload)});
 })
