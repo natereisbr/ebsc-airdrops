@@ -16,7 +16,7 @@ app.set('view engine', 'html');
 app.set('views', __dirname);
 
 const blacklist = [
-  ' PancakeSwap V2: EBSC',
+  'PancakeSwap V2: EBSC',
   '0x0f59d00312b0c8f9215fdbad81d3341fbf676900',
   '0xed3d9db9c714f88df9eb579134b525f9863b2dda',
   '0x64be33a23a7753a8e6f32117f480cb04cc753378',
@@ -52,7 +52,7 @@ function categorize(wallets, tiers) {
   let hasBlacklistedAddress = false
 
   wallets.map(wallet => {
-    if(blacklist.indexOf(wallet.address) == -1) {
+    if(blacklist.indexOf(wallet.address.trim()) == -1) {
       if (wallet.amount >= tiers['evangelist'].min) {
         wallet.tier = tiers['evangelist'].title
         tiers['evangelist'].total += wallet.amount

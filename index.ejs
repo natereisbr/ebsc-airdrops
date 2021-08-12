@@ -93,6 +93,60 @@
             opacity: 0.6;
         }
 
+        .tab-bar {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .tab-bar .tab { 
+            flex: 1;
+            position: relative;
+        }
+
+        .tab-bar .tab:first-child {
+            margin-right: 2px;
+        }
+
+        .tab-bar .tab:last-child {
+            margin-left: 2px;
+        }
+
+        .lithium-button{ 
+            width: 100%;
+            border: none;
+            height: 58px;
+            background-color: transparent;
+            position: relative;
+            padding: 0px 40px;
+            text-transform: uppercase;
+            font-size: 16px;
+            font-family: "Share Tech", sans-serif;
+            color: rgb(255, 252, 252);
+            min-width: 200px;
+            cursor: pointer;
+        }
+
+
+        .lithium-button.active{ 
+            color: rgb(41, 41, 41);
+        }
+
+        .lithium-button:before{
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            z-index: -1;
+            content: "";
+            width: 100%;
+            height: 100%;
+            background-color: rgb(29, 233, 192);
+            clip-path: polygon(0% 0%, calc(100% - 15px) 0%, 100% 15px, 100% 100%, 15px 100%, 0px calc(100% - 15px), 0px 2px, 2px 2px, 2px calc(100% - 16px), 16px calc(100% - 2px), calc(100% - 2px) calc(100% - 2px), calc(100% - 2px) 16px, calc(100% - 16px) 2px, 0px 2px, 0px 0px);
+        }
+
+        .lithium-button.active:before{
+            clip-path: polygon(0% 0%, calc(100% - 15px) 0%, 100% 15px, 100% 100%, 15px 100%, 0px calc(100% - 15px), 0px 0px);
+        }
+
         @keyframes pulse{0%{opacity:0;}50%{opacity:100;}100%{opacity:0;}}
     </style>
 </head>
@@ -103,66 +157,118 @@
                 <h1>
                     Lithium Airdrops Calculator
                 </h1>
+                <p>
+                    <span>$EBSC eligible:</span> {{ tokensEligible }}
+                </p>
     
                 <div class="mt-3">
                     <h2>
                         Project settings:
                     </h2>
-                    <p>
-                        <span>$EBSC eligible:</span> {{ tokensEligible }}
-                    </p>
                     <div class="form-group">
                         <label for="">Market Cap ($):</label>
-                        <input class="form-control" type="text" v-model="project.mc">
+                        <input class="form-control" type="text" inputmode="numeric" pattern="[0-9]*" v-model="project.mc">
                     </div>
                     <div class="form-group">
-                        <label for="">Quantity of tokens:</label>
-                        <input class="form-control" type="text" v-model="project.tokenQuantity">
+                        <label for="">Project supply:</label>
+                        <input class="form-control" type="text" inputmode="numeric" pattern="[0-9]*" v-model="project.tokenQuantity">
                     </div>
                     <div class="form-group">
                         <label for="">Airdrop %:</label>
-                        <input class="form-control" type="text" v-model="project.airdropPerc">
+                        <input class="form-control" type="text" inputmode="numeric" pattern="[0-9]*" v-model="project.airdropPerc">
                     </div>
                     <div class="form-group">
-                        <label for="">Wallet address:</label>
-                        <input class="form-control" type="text" v-model="searchAddress">
-                    </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary btn-block" @click="search">Calculate</button>
+                        <button type="button" class="lithium-button active" @click="search">Calculate</button>
                     </div>
                 </div> 
                 
                 <div class="list" v-if="isSearching">
-                    <template v-for="wallet in payload.wallets">
-                        <div class="list-item" v-if="!searchAddress || wallet.address.includes(searchAddress)">
-                            <p>
-                                <span v-if="wallet.tier == 'strategist'" class="badge badge-strategist">Strategist</span>
-                                <span v-else class="badge badge-evangelist">Evangelist</span>
-                                {{wallet.address}}
-                            </p>
-                            <div class="tile" v-bind:class="{ 'tile-strategist': wallet.tier == 'strategist', 'tile-evangelist': wallet.tier == 'evangelist' }">
-                                <div class="tile-header">
-                                    <div>
-                                        <span>Amount of $EBSC</span>
-                                        <div>{{wallet.amount}}</div>
-                                    </div>
-                                    <div>
-                                        <span>Percentage:</span>
-                                        <div>{{ ((wallet.amount / tokensEligible) * 100).toFixed(2) }}%</div>
-                                    </div>
-                                </div>
-                                <span>Airdrop:</span>
-                                <div class="highlight">
-                                    {{ ((wallet.amount / tokensEligible) * project.airdropTokens).toFixed(2) }} Tokens
-                                    <span>${{ ((wallet.amount / tokensEligible) * project.airdropTokens * project.price).toFixed(2) }}</span>
-                                </div>
+                    <div class="tab-bar">
+                        <div class="tab">
+                            <button class="lithium-button" v-bind:class="{ 'active': tabState == 'wallets'}" type="button" @click="tabState = 'wallets'">Wallets</button>
+                        </div>
+                        <div class="tab">
+                            <button class="lithium-button" v-bind:class="{ 'active': tabState == 'projection'}" type="button" @click="tabState = 'projection'">Projection</button>
+                        </div>
+                    </div>
+                    <div v-if="tabState == 'wallets'">
+                        <div class="mt-3">
+                            <div class="form-group">
+                                <label for="">Filter wallets:</label>
+                                <input class="form-control" type="text" v-model="searchAddress">
                             </div>
                         </div>
-                    </template>
+                        <template v-for="wallet in payload.wallets">
+                            <div class="list-item" v-if="!searchAddress || wallet.address.includes(searchAddress)">
+                                <p>
+                                    <span v-if="wallet.tier == 'strategist'" class="badge badge-strategist">Strategist</span>
+                                    <span v-else class="badge badge-evangelist">Evangelist</span>
+                                    {{wallet.address}}
+                                </p>
+                                <div class="tile" v-bind:class="{ 'tile-strategist': wallet.tier == 'strategist', 'tile-evangelist': wallet.tier == 'evangelist' }">
+                                    <div class="tile-header">
+                                        <div>
+                                            <span>Amount of $EBSC</span>
+                                            <div>{{wallet.amount}}</div>
+                                        </div>
+                                        <div>
+                                            <span>Percentage:</span>
+                                            <div>{{ ((wallet.amount / tokensEligible) * 100).toFixed(2) }}%</div>
+                                        </div>
+                                    </div>
+                                    <span>Airdrop:</span>
+                                    <div class="highlight">
+                                        {{ ((wallet.amount / tokensEligible) * project.airdropTokens).toFixed(2) }} Tokens
+                                        <span>${{ ((wallet.amount / tokensEligible) * project.airdropTokens * project.price).toFixed(2) }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                    <div v-if="tabState == 'projection'">
+                        <div class="projections-container mt-3">
+                            <div class="form-group">
+                                <label for="">$EBSC eligible amount:</label>
+                                <input class="form-control" type="text" inputmode="numeric" pattern="[0-9]*" v-model="projection.eligible">
+                            </div>
+                            <div class="form-group">
+                                <label for="">Wallet estimated amount:</label>
+                                <input class="form-control" type="text" inputmode="numeric" pattern="[0-9]*" v-model="projection.amount">
+                            </div>
+
+                            <div v-if="projection.amount >= 2500000 && projection.eligible > 0">
+                                <div class="list-item">
+                                    <p>
+                                        <span v-if="projection.amount < 7000000" class="badge badge-strategist">Strategist</span>
+                                        <span v-else class="badge badge-evangelist">Evangelist</span>
+                                        Simulation
+                                    </p>
+                                    <div class="tile" v-bind:class="{ 'tile-strategist': projection.amount < 7000000, 'tile-evangelist': projection.amount >= 7000000 }">
+                                        <div class="tile-header">
+                                            <div>
+                                                <span>Amount of $EBSC</span>
+                                                <div>{{projection.amount}}</div>
+                                            </div>
+                                            <div>
+                                                <span>Percentage:</span>
+                                                <div>{{ ((projection.amount / projection.eligible) * 100).toFixed(2) }}%</div>
+                                            </div>
+                                        </div>
+                                        <span>Airdrop:</span>
+                                        <div class="highlight">
+                                            {{ ((projection.amount / projection.eligible) * project.airdropTokens).toFixed(2) }} Tokens
+                                            <span>${{ ((projection.amount / projection.eligible) * project.airdropTokens * project.price).toFixed(2) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="footer">
-                    <p>This is an open source project created by <a target="_blank" href="https://github.com/natereisbr">@natereisbr</a>. Fell free to pay me a beer in 0xc754644B61C7EE8FF63A544E3ad008a36cf80953 <span style="color: red;">&hearts;</span></p>
+                    <p>This is an open source project created by <a target="_blank" href="https://github.com/natereisbr">@natereisbr</a>. Feel free to buy me a beer in <strong>0xc754644B61C7EE8FF63A544E3ad008a36cf80953</strong> <span style="color: red;">&hearts;</span></p>
                 </div>
             </div>
         </div>
@@ -173,6 +279,7 @@
         const app = new Vue({
             el: '#app',
             data: {
+                tabState: 'wallets',
                 project: {
                     mc: 10000000,
                     tokenQuantity: 5000000,
@@ -187,6 +294,10 @@
                         strategist: 0.01,
                         evangelist: 0.01,
                     }
+                },
+                projection: {
+                    eligible: 0,
+                    amount: 2500000
                 },
                 isSearching: false,
                 searchAddress: '',
@@ -205,6 +316,7 @@
                     if (this.project.mc && this.project.mc != 0 && this.project.tokenQuantity && this.project.tokenQuantity != 0 && this.project.airdropPerc > 0 && this.project.airdropPerc <= 100) {
                         this.project.airdropTokens = (this.project.airdropPerc / 100) * this.project.tokenQuantity
                         this.project.price = this.project.mc / this.project.tokenQuantity
+                        this.projection.eligible = this.tokensEligible;
                         this.isSearching = true
                     }
                 }
