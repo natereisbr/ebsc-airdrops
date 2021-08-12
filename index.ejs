@@ -205,7 +205,7 @@
                             </div>
                         </div>
                         <template v-for="wallet in payload.wallets">
-                            <div class="list-item" v-if="!searchAddress || wallet.address.includes(searchAddress)">
+                            <div class="list-item" v-if="!searchAddress || wallet.address.includes(searchAddress.toLowerCase())">
                                 <p>
                                     <span v-if="wallet.tier == 'strategist'" class="badge badge-strategist">Strategist</span>
                                     <span v-else class="badge badge-evangelist">Evangelist</span>
