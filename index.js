@@ -47,21 +47,25 @@ function parser(data) {
   return wallets
 }
 
-function categorize(wallets, tiers) {
+function categorize(wallets, tiers, startIndex) {
   let categorized_wallets = []
   let hasBlacklistedAddress = false
 
+  let index = startIndex + 1
   wallets.map(wallet => {
     if(blacklist.indexOf(wallet.address.trim()) == -1) {
       if (wallet.amount >= tiers['evangelist'].min) {
+        wallet.index = index
         wallet.tier = tiers['evangelist'].title
         tiers['evangelist'].total += wallet.amount
         categorized_wallets.push(wallet)
-  
+        index++
       } else  if (wallet.amount >= tiers['strategist'].min) {
+        wallet.index = index
         wallet.tier = tiers['strategist'].title
         tiers['strategist'].total += wallet.amount
         categorized_wallets.push(wallet)
+        index++
       }
     } else {
       hasBlacklistedAddress = true
@@ -84,7 +88,7 @@ async function getData(payload) {
 
   while (goToNext) {
     let wallets = await getNextPage(page_number)
-    let categorized = categorize(wallets, payload['tiers'])
+    let categorized = categorize(wallets, payload['tiers'], payload.wallets.length)
   
     payload.tiers = categorized.tiers
     payload.wallets = payload.wallets.concat( categorized.wallets)
