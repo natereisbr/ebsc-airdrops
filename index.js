@@ -27,7 +27,9 @@ const blacklist = [
 
 
 function numberFormatter(strValue) {
-  const parsedStrValue = strValue.replace(/,/g, '')
+  if (!strValue) return 0
+
+  const parsedStrValue = strValue.trim().replace(/,/g, '').replace('$', '')
   return parseFloat(parsedStrValue)
 }
 
@@ -86,6 +88,10 @@ async function getData(payload) {
   let page_number = 1
   let goToNext = true
 
+  const ebscInfo = await fetchPrice()
+  ebscInfo['data'].priceNumber = numberFormatter(ebscInfo['data'].price)
+  payload.ebscInfo = ebscInfo['data']
+
   while (goToNext) {
     let wallets = await getNextPage(page_number)
     let categorized = categorize(wallets, payload['tiers'], payload.wallets.length)
@@ -107,9 +113,22 @@ async function fetch (page) {
   return await axios.get('https://bscscan.com/token/generic-tokenholders2?a=0x01a78db633940579e15e7bdb8edfee8ecdea4522&m=normal&p=' + page)
 }
 
+async function fetchPrice () {
+  return await axios.get('https://europe-west1-earlybsc-c1957.cloudfunctions.net/api/values')
+}
+
 app.get('/', async (req, res) => {
   let payload = {
     itemsPerPage: 50,
+    ebscInfo: {
+      holdersValue: "",
+      holders: "",
+      marketcap: "",
+      change: "",
+      price: "",
+      priceNumber: 0,
+      liquidity: ""
+    },
     tiers : {
       "strategist": {
         min: 2500000,

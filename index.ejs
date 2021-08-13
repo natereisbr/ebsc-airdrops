@@ -12,6 +12,7 @@
     <style>
         * {
             font-family: "Share Tech", sans-serif;
+            outline: none !important;
         }
 
         body {
@@ -60,7 +61,7 @@
             margin-bottom: 5px;
         }
 
-        .tile span {
+        .tile span.low-opacity {
             text-transform: uppercase;
             color: rgb(255, 252, 252);
             line-height: 18px;
@@ -68,12 +69,12 @@
             opacity: 0.6;
         }
 
-        .tile-header {
+        .tile-group {
             display: flex;
             flex-direction: row;
         }
 
-        .tile-header > div {
+        .tile-group > div {
             flex: 1;
         }
 
@@ -95,6 +96,10 @@
             line-height: 18px;
             font-size: 16px;
             opacity: 0.6;
+        }
+
+        .highlight {
+            color: #1DE9C0;
         }
 
         .tab-bar {
@@ -163,6 +168,7 @@
                 </h1>
                 <p>
                     <span>$EBSC eligible:</span> {{ tokensEligible }} <br>
+                    <span>$EBSC price:</span> {{ payload.ebscInfo.price.trim() }} <br>
                     <span>Evangelist tier:</span> {{ evangelistHolders }} holders<br>
                     <span>Strategist tier:</span> {{ strategistHolders }} holders
                 </p>
@@ -209,24 +215,36 @@
                                 <p>
                                     <span v-if="wallet.tier == 'strategist'" class="badge badge-strategist">Strategist</span>
                                     <span v-else class="badge badge-evangelist">Evangelist</span>
-                                    <span class="badge badge-position">#{{ wallet.index }}</span>
                                     {{wallet.address}}
                                 </p>
                                 <div class="tile" v-bind:class="{ 'tile-strategist': wallet.tier == 'strategist', 'tile-evangelist': wallet.tier == 'evangelist' }">
-                                    <div class="tile-header">
+                                    <div class="tile-group">
                                         <div>
-                                            <span>Amount of $EBSC</span>
-                                            <div>{{wallet.amount}}</div>
-                                        </div>
-                                        <div>
-                                            <span>Percentage:</span>
-                                            <div>{{ ((wallet.amount / tokensEligible) * 100).toFixed(2) }}%</div>
+                                            <div><span class="badge badge-position">#{{ wallet.index }}</span> {{wallet.amount.toFixed(2)}} <span class="low-opacity">$EBSC</span></div>
                                         </div>
                                     </div>
-                                    <span>Airdrop:</span>
-                                    <div class="highlight">
-                                        {{ ((wallet.amount / tokensEligible) * project.airdropTokens).toFixed(2) }} Tokens
-                                        <span>${{ ((wallet.amount / tokensEligible) * project.airdropTokens * project.price).toFixed(2) }}</span>
+                                    <div class="tile-group">
+                                        <div>
+                                            <span class="low-opacity">Airdrop %:</span>
+                                            <div>{{ ((wallet.amount / tokensEligible) * 100).toFixed(2) }}%</div>
+                                        </div>
+                                        <div>
+                                            <span class="low-opacity">$EBSC Investment</span>
+                                            <div>${{(wallet.amount * payload.ebscInfo.priceNumber).toFixed(2) }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="tile-group">
+                                        <div>
+                                            <span class="low-opacity">Airdrop:</span>
+                                            <div>
+                                                <strong class="highlight">{{ ((wallet.amount / tokensEligible) * project.airdropTokens).toFixed(2) }}</strong> Tokens
+                                                <span>${{ ((wallet.amount / tokensEligible) * project.airdropTokens * project.price).toFixed(2) }}</span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <span class="low-opacity">ROI:</span>
+                                            <div>{{ ((((wallet.amount / tokensEligible) * project.airdropTokens * project.price) / (wallet.amount * payload.ebscInfo.priceNumber)) * 100).toFixed(2) }}%</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -251,20 +269,34 @@
                                         Simulation
                                     </p>
                                     <div class="tile" v-bind:class="{ 'tile-strategist': projection.amount < 7000000, 'tile-evangelist': projection.amount >= 7000000 }">
-                                        <div class="tile-header">
+                                        <div class="tile-group">
                                             <div>
-                                                <span>Amount of $EBSC</span>
-                                                <div>{{projection.amount}}</div>
-                                            </div>
-                                            <div>
-                                                <span>Percentage:</span>
-                                                <div>{{ ((projection.amount / projection.eligible) * 100).toFixed(2) }}%</div>
+                                                <div>{{ parseFloat(projection.amount).toFixed(2)}} <span class="low-opacity">$EBSC</span></div>
                                             </div>
                                         </div>
-                                        <span>Airdrop:</span>
-                                        <div class="highlight">
-                                            {{ ((projection.amount / projection.eligible) * project.airdropTokens).toFixed(2) }} Tokens
-                                            <span>${{ ((projection.amount / projection.eligible) * project.airdropTokens * project.price).toFixed(2) }}</span>
+                                        <div class="tile-group">
+                                            <div>
+                                                <span>Airdrop %:</span>
+                                                <div>{{ ((projection.amount / projection.eligible) * 100).toFixed(2) }}%</div>
+                                            </div>
+
+                                            <div>
+                                                <span class="low-opacity">$EBSC Investment</span>
+                                                <div>${{(projection.amount * payload.ebscInfo.priceNumber).toFixed(2) }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="tile-group">
+                                            <div>
+                                                <span>Airdrop:</span>
+                                                <div class="highlight">
+                                                    <strong class="highlight">{{ ((projection.amount / projection.eligible) * project.airdropTokens).toFixed(2) }}</strong> Tokens
+                                                    <span>${{ ((projection.amount / projection.eligible) * project.airdropTokens * project.price).toFixed(2) }}</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <span class="low-opacity">ROI:</span>
+                                                <div>{{ ((((projection.amount / projection.eligible) * project.airdropTokens * project.price) / (projection.amount * payload.ebscInfo.priceNumber)) * 100).toFixed(2) }}%</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
