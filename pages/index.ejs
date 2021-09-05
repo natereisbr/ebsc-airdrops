@@ -4,174 +4,49 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://lithium.ventures/favicon-32x32.png" type="image/png">
     <title>Lithium Airdrops Calculator</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <style>
-        * {
-            font-family: "Share Tech", sans-serif;
-            outline: none !important;
-        }
-
-        body {
-            background-color: rgb(16, 6, 48);
-            background-image: url(https://lithium.ventures/static/background-values-737509f7086dde47dcc38fe6026ed363.png);
-            background-attachment: fixed;
-            background-size: cover;
-            color: white;
-        }
-
-        h1 {
-            font-weight: bold;
-            font-size: 50px;
-        }
-
-        h1:after {
-            content: "_";
-            animation: 0.6s ease 0s infinite normal none running pulse;
-        }
-
-        h2 {
-            font-size: 20px;
-            text-transform: uppercase;
-        }
-
-        .list {
-            margin-top: 50px;
-        }
-
-        .tile {
-            border: solid 1px;
-            border-radius: 5px;
-            padding: 5px;
-            margin-bottom: 15px;
-        }
-
-        .tile-strategist {
-            border-color: #CF40E1;
-        }
-
-        .tile-evangelist {
-            border-color: #48ACE5;
-        }
-
-        .list-item p {
-            margin-bottom: 5px;
-        }
-
-        .tile span.low-opacity {
-            text-transform: uppercase;
-            color: rgb(255, 252, 252);
-            line-height: 18px;
-            font-size: 16px;
-            opacity: 0.6;
-        }
-
-        .tile-group {
-            display: flex;
-            flex-direction: row;
-        }
-
-        .tile-group > div {
-            flex: 1;
-        }
-
-        .badge-strategist {
-            background-color: #CF40E1;
-        }
-
-        .badge-evangelist {
-            background-color: #48ACE5;
-        }
-        .badge-position {
-            background-color: #1DE9C0;
-            color: black;
-        }
-
-        .footer {
-            margin: 30px 0;
-            color: rgb(255, 252, 252);
-            line-height: 18px;
-            font-size: 16px;
-            opacity: 0.6;
-        }
-
-        .highlight {
-            color: #1DE9C0;
-        }
-
-        .tab-bar {
-            display: flex;
-            flex-direction: row;
-        }
-
-        .tab-bar .tab { 
-            flex: 1;
-            position: relative;
-        }
-
-        .tab-bar .tab:first-child {
-            margin-right: 2px;
-        }
-
-        .tab-bar .tab:last-child {
-            margin-left: 2px;
-        }
-
-        .lithium-button{ 
-            width: 100%;
-            border: none;
-            height: 58px;
-            background-color: transparent;
-            position: relative;
-            padding: 0px;
-            text-transform: uppercase;
-            font-size: 16px;
-            font-family: "Share Tech", sans-serif;
-            color: rgb(255, 252, 252);
-            min-width: 100px;
-            cursor: pointer;
-        }
-
-
-        .lithium-button.active{ 
-            color: rgb(41, 41, 41);
-        }
-
-        .lithium-button:before{
-            position: absolute;
-            top: 0px;
-            left: 0px;
-            z-index: -1;
-            content: "";
-            width: 100%;
-            height: 100%;
-            background-color: rgb(29, 233, 192);
-            clip-path: polygon(0% 0%, calc(100% - 15px) 0%, 100% 15px, 100% 100%, 15px 100%, 0px calc(100% - 15px), 0px 2px, 2px 2px, 2px calc(100% - 16px), 16px calc(100% - 2px), calc(100% - 2px) calc(100% - 2px), calc(100% - 2px) 16px, calc(100% - 16px) 2px, 0px 2px, 0px 0px);
-        }
-
-        .lithium-button.active:before{
-            clip-path: polygon(0% 0%, calc(100% - 15px) 0%, 100% 15px, 100% 100%, 15px 100%, 0px calc(100% - 15px), 0px 0px);
-        }
-
-        @keyframes pulse{0%{opacity:0;}50%{opacity:100;}100%{opacity:0;}}
-    </style>
+    <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
     <div id="app">
+        <app-header></app-header>
         <div class="container mt-3">
             <div class="col-md-6 offset-md-3">
                 <h1>
                     Lithium Airdrops Calculator
                 </h1>
                 <p>
-                    <span>$EBSC eligible:</span> {{ tokensEligible }} <br>
-                    <span>$EBSC price:</span> {{ payload.ebscInfo.price.trim() }} <br>
+                    <span>Tokens eligible:</span> {{ tokensEligible }} <br>
+                    <!-- <span>$EBSC price:</span> {{ payload.ebscInfo.price.trim() }} <br>
                     <span>Evangelist tier:</span> {{ evangelistHolders }} holders<br>
-                    <span>Strategist tier:</span> {{ strategistHolders }} holders
+                    <span>Strategist tier:</span> {{ strategistHolders }} holders -->
                 </p>
+
+                <div class="top-cards">
+                    <div class="cp-card-mini">
+                        <p>Evangelists:</p>
+                        <span>
+                            {{ evangelistHolders }}
+                        </span>
+                    </div>
+                    <div class="cp-card-mini">
+                        <p>Strategists:</p>
+                        <span>
+                            {{ strategistHolders }}
+                        </span>
+                    </div>
+                    <div class="cp-card-mini">
+                        <p>$EBSC price:</p>
+                        <span>
+                            {{  payload.ebscInfo.price.trim().substr(0,8) }}
+                        </span>
+                    </div>
+                </div>
     
                 <div class="mt-3">
                     <h2>
@@ -300,23 +175,25 @@
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="footer">
-                    <p>This is an open source project created by <a target="_blank" href="https://github.com/natereisbr">@natereisbr</a>. Feel free to buy me a beer in <strong>0xc754644B61C7EE8FF63A544E3ad008a36cf80953</strong> <span style="color: red;">&hearts;</span></p>
-                </div>
+                <app-footer></app-footer>
             </div>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="./components/Header.vue.js"></script>
+    <script src="./components/Footer.vue.js"></script>
     <script>
         const app = new Vue({
             el: '#app',
+            components: {
+                'app-footer': Footer,
+                'app-header': Header
+            },
             data: {
                 tabState: 'wallets',
                 project: {

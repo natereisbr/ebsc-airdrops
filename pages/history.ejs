@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top tiers history</title>
+    <link rel="icon" href="https://lithium.ventures/favicon-32x32.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <style>
+    </style>
+    <div id="app">
+        <app-header></app-header>
+        <div class="container mt-3">
+            <div class="col-md-12">
+                <h1>Top tiers history</h1>
+                <p></p>
+
+                <div class="cp-card">
+                    <highcharts :options="holdersCountOptions" ref="highcharts"></highcharts>
+                </div>
+                <div class="mt-3 cp-card">
+                    <highcharts :options="holdersAmountOptions" ref="highcharts"></highcharts>
+                </div>
+                <app-footer></app-footer>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highcharts@6/highcharts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-highcharts@0.1/dist/vue-highcharts.min.js"></script>
+    <script src="./components/Footer.vue.js"></script>
+    <script src="./components/Header.vue.js"></script>
+
+    <script>
+        const app = new Vue({
+            el: '#app',
+            components: {
+                'app-footer': Footer,
+                'app-header': Header
+            },
+            data: {
+                payload: JSON.parse('<%- payload %>'),
+                holdersCountOptions: {},
+                holdersAmountOptions: {}
+            },
+            methods: {
+                createLineChart(title, categories, series, yTitle, valueSuffix) {
+                     return {
+                        title: {
+                            text: title,
+                            style: {
+                                color: '#1DE9C0',
+                                fontSize: '24px'
+                            },
+                            x: -20 //center
+                        },
+                        xAxis: {
+                            categories,
+                            labels: {
+                                style: {
+                                    color: '#FFFFFF'
+                                }
+                            }
+                        },
+                        yAxis: {
+                            title: {
+                                text: yTitle,
+                                style: {
+                                    color: '#1DE9C0'
+                                }
+                            },
+                            labels: {
+                                style: {
+                                    color: '#FFFFFF'
+                                }
+                            },
+                            plotLines: [{
+                                value: 0,
+                                width: 1,
+                                color: '#808080'
+                            }]
+                        },
+                        tooltip: {
+                            valueSuffix
+                        },
+                        series,
+                        legend: {
+                            itemStyle: {
+                                color: '#FFFFFF',
+                                fontSize: '14px'
+                            }
+                        },
+                        chart: {
+                            backgroundColor: 'transparent',
+                        }
+                    }
+                }
+            },
+            created() {
+                this.payload.reverse()
+                const holdersChartCategories = []
+                const holdersCountSeries = [
+                {
+                        name: 'Evangelists',
+                        data: [],
+                        color: '#CF40E1'
+                    },
+                    {
+                        name: 'Strategists',
+                        data: [],
+                        color: '#48ACE5'
+                    }
+                ]
+                const holdersAmountSeries = [
+                {
+                        name: 'Evangelists',
+                        data: [],
+                        color: '#CF40E1'
+                    },
+                    {
+                        name: 'Strategists',
+                        data: [],
+                        color: '#48ACE5'
+                    }
+                ]
+
+                this.payload.forEach(e => {
+                    const date = new Date(e.date)
+                    const formattedDate = ((date.getMonth() + 1)) + "/" + ((date.getDate() )) + "/" + date.getFullYear(); 
+                    holdersChartCategories.push(formattedDate)
+                    
+                    // Evangelists
+                    holdersCountSeries[0].data.push(e.evangelists_count)
+                    holdersAmountSeries[0].data.push(e.evangelists_amount)
+                    // Strategists
+                    holdersCountSeries[1].data.push(e.strategists_count)
+                    holdersAmountSeries[1].data.push(e.strategists_amount)
+                })
+
+                this.holdersCountOptions = this.createLineChart('Top tier\'s holders in the last 30 days', holdersChartCategories, holdersCountSeries, 'Quantity of holders', ' holders' )
+                this.holdersAmountOptions = this.createLineChart('Top tier\'s tokens in the last 30 days', holdersChartCategories, holdersAmountSeries, 'Tokens amount', ' tokens' )
+
+            }
+        })
+    </script>
+</body>
+</html>
